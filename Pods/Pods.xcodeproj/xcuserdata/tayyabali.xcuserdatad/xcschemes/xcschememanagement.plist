@@ -123,6 +123,11 @@
 			<key>orderHint</key>
 			<integer>18</integer>
 		</dict>
+		<key>SDWebImage.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>21</integer>
+		</dict>
 		<key>SwiftyStoreKit.xcscheme</key>
 		<dict>
 			<key>isShown</key>

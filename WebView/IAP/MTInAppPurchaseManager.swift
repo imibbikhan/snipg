@@ -24,6 +24,7 @@ protocol MTInAppPurchaseDelegate {
     func inAppPurchase(didVerifyPurchaseFor products: [ReceiptItem], expiryDate: Date?, type: MTInAppPurchaseManager.PurchaseType)
     func inAppPurchase(didCompletePurchaseFor product: PurchaseDetails)
     func inAppPurchase(didCompleteWithError error: String)
+    func inAppPurchase(didCancleProcess error: String)
     func inAppPurchase(didRetriveProductsWith products: [SKProduct])
     func inAppPurchase(didRestored products: [Purchase])
     func inAppPurchase(isExpired products: [ReceiptItem])
@@ -182,19 +183,21 @@ extension MTInAppPurchaseManager {
         }
         
         SwiftyStoreKit.purchaseProduct(productId, atomically: true) { result in
-            
-            switch result {
-            case .success(let product):
-                // Deliver content from server, then:
-                if product.needsFinishTransaction {
-                    SwiftyStoreKit.finishTransaction(product.transaction)
-                }
-                self.delegate?.inAppPurchase(didCompletePurchaseFor: product)
+            self.purchaseResultHandler(result)
 
-                self.verifyPurchase(with: [productId], type: type, validDuration: validDuration)
-            case .error(let error):
-                self.delegate?.inAppPurchase(didCompleteWithError: error.localizedDescription)
-            }
+//            switch result {
+//            case .success(let product):
+                
+//                // Deliver content from server, then:
+//                if product.needsFinishTransaction {
+//                    SwiftyStoreKit.finishTransaction(product.transaction)
+//                }
+//                self.delegate?.inAppPurchase(didCompletePurchaseFor: product)
+//
+//                self.verifyPurchase(with: [productId], type: type, validDuration: validDuration)
+//            case .error(let error):
+//                self.delegate?.inAppPurchase(didCompleteWithError: error.localizedDescription)
+//            }
         }
     }
     
@@ -274,7 +277,9 @@ extension MTInAppPurchaseManager {
             case .clientInvalid:
                 customError = "Not allowed to make the payment"
                 print("Not allowed to make the payment")
-            case .paymentCancelled: break
+            case .paymentCancelled:
+                self.delegate?.inAppPurchase(didCancleProcess: "")
+                return
             case .paymentInvalid:
                 customError = "Not allowed to make the payment"
                 print("The purchase identifier was invalid")

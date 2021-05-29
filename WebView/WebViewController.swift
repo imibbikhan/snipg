@@ -152,10 +152,17 @@ class WebViewController: UIViewController {
 // MARK: - LoginDelegates
 extension WebViewController: LoginDelegates {
     func success(name: String, email: String, token: String, imageLink: String, network: String) {
-        let urlString = "https://snipg.com/mobile-app.php?login?os=ios&device=iphone&social-login=1&token=\(token)&name=\(name)&email=\(email)&image=\(imageLink)&network=\(network)".replacingOccurrences(of: " ", with: "%20")
-        let url = URL(string: urlString)
-        let request = URLRequest(url: url!)
-        print("URL ON SUCCESS: \(urlString)")
+        let baseURL = "https://snipg.com/mobile-app.php?session=1&os=ios&device=iphone&social-login=1&"
+        
+        let params = "token=\(token)" +
+            "&name=\(name)" +
+            "&image=\(imageLink)" +
+            "&network=\(network)"
+
+        let urlString = (baseURL + params).replacingOccurrences(of: " ", with: "%20")
+        guard let url = URL(string: urlString) else { return }
+        print(url)
+        let request = URLRequest(url: url)
         webView.load(request)
     }
     
@@ -426,10 +433,11 @@ extension WebViewController: MTInAppPurchaseDelegate {
     
     func inAppPurchase(didCompleteWithError error: String) {
         indicator.stopAnimating()
-        if error != "" {
-            self.error(message: error)
-        }
-        
+        self.error(message: error)
+    }
+    
+    func inAppPurchase(didCancleProcess error: String) {
+        indicator.stopAnimating()
     }
 }
 
